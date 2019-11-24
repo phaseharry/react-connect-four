@@ -47,20 +47,20 @@ class App extends React.Component {
     if(isWinner){
       this.setState({
         ...this.state,
-        newBoard,
+        board: newBoard,
         isThereAWinner: true
       })
     } else if(fullBoard){
       this.setState({
         ...this.state,
-        newBoard,
+        board: newBoard,
         player1Turn: !player1Turn,
         tie: true
       })
     } else {
       this.setState({
         ...this.state,
-        newBoard,
+        board: newBoard,
         player1Turn: !player1Turn,
       })
     }
