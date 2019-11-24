@@ -2,6 +2,8 @@ import React from 'react';
 
 import Row from './components/Row'
 
+import horizontalCheck from './utilityChecks/horizontalCheck'
+
 class App extends React.Component {
   state = {
     board: [
@@ -14,16 +16,22 @@ class App extends React.Component {
     ],
     player1Turn: true,
     isThereAWinner: false,
-    tie: false
+    tie: false,
   }
 
   selectSpot = col => {
-    const { board, player1Turn } = this.state
-    const { isBoardFull } = this
+    const { board, player1Turn, tie, isThereAWinner } = this.state
+    const { isBoardFull, checkIfWinner } = this
+
+    if(tie || isThereAWinner) return // making sure game state cant be changed once a tie or a win occurs
+
     const newBoard = board
+    let rowCheckWasPlaced
+    
     for(let i = newBoard.length - 1; i >= 0; i--){
       if(newBoard[i][col] === ''){
         newBoard[i][col] = player1Turn? 'R' : 'Y'
+        rowCheckWasPlaced = i
         break
       }
       if(i === 0) return 
@@ -34,8 +42,15 @@ class App extends React.Component {
     }
     
     const fullBoard = isBoardFull(newBoard)
+    const isWinner = checkIfWinner(newBoard, player1Turn, col, rowCheckWasPlaced)
   
-    if(fullBoard){
+    if(isWinner){
+      this.setState({
+        ...this.state,
+        newBoard,
+        isThereAWinner: true
+      })
+    } else if(fullBoard){
       this.setState({
         ...this.state,
         newBoard,
@@ -63,16 +78,18 @@ class App extends React.Component {
     return true
   }
 
-  isWinner = board => {
-    
+  checkIfWinner = (board, player1, col, row) => { //if player1 is true, check for R's else check for Y's
+    const color = player1? 'R' : 'Y'
+    return horizontalCheck(board, color, row)
   }
 
   render(){
-    const { board, player1Turn, tie } = this.state
+    const { board, player1Turn, tie, isThereAWinner } = this.state
     const { selectSpot } = this
     return (
       <div>
         {tie? <h2>Tie</h2> : null}
+        {isThereAWinner? player1Turn? <h1>Red Wins</h1> : <h1>Yellow Wins</h1> : null} 
          <table style={styles.tableBorder}>
            <tbody> 
         {
